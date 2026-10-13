@@ -89,7 +89,13 @@ const ItemSchema = new mongoose.Schema({
   claimRequestedAt: {
     type: Date,
     default: null
-  }
+  },
+  comments: [{
+    text: { type: String, required: true, trim: true },
+    isAdmin: { type: Boolean, default: false },
+    senderName: { type: String, default: 'ผู้ใช้ทั่วไป (นิรนาม)' },
+    createdAt: { type: Date, default: Date.now }
+  }]
 }, {
   timestamps: true
 });
@@ -149,10 +155,13 @@ app.post('/api/items', async (req, res) => {
   }
 });
 
-// 4. GET /api/items - ดึงรายการทั้งหมด
+// 4. GET /api/items - ดึงรายการทั้งหมด (ซ่อน IG ถ้าไม่ใช่แอดมิน เพื่อความปลอดภัยและเป็นส่วนตัว)
 app.get('/api/items', async (req, res) => {
   try {
     const { type, status, category, search } = req.query;
+    const adminPassword = req.headers['x-admin-password'];
+    const isAdmin = (adminPassword === ADMIN_PASSWORD);
+
     const filter = {};
 
     if (type) filter.reportType = type.toUpperCase();
@@ -167,10 +176,21 @@ app.get('/api/items', async (req, res) => {
     }
 
     const items = await Item.find(filter).sort({ createdAt: -1 });
+
+    // หากไม่ใช่แอดมิน ให้เซ็นเซอร์ IG ไม่ให้คนทั่วไปเห็น
+    const sanitizedItems = items.map(item => {
+      const obj = item.toObject();
+      if (!isAdmin && obj.claimantInstagram) {
+        // ซ่อน IG สำหรับบุคคลทั่วไป (คงไว้เพียงสัญลักษณ์ว่ามีคนขอรับแล้ว)
+        obj.claimantInstagram = '***ซ่อนข้อมูล (เฉพาะแอดมินที่เห็น)***';
+      }
+      return obj;
+    });
+
     return res.json({
       success: true,
-      count: items.length,
-      data: items
+      count: sanitizedItems.length,
+      data: sanitizedItems
     });
   } catch (error) {
     console.error('Error fetching items:', error);
@@ -269,7 +289,53 @@ app.post('/api/items/:id/reject', verifyAdmin, async (req, res) => {
   }
 });
 
-// 8. DELETE /api/items/:id - แอดมินลบโพสต์ออกจาก MongoDB ทันที (ต้องผ่าน verifyAdmin)
+// 8. POST /api/items/:id/comments - ส่งคอมเมนต์ / สนทนาในโพสต์สิ่งของ
+app.post('/api/items/:id/comments', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: 'กรุณากรอกข้อความ' });
+    }
+
+    const item = await Item.findById(req.params.id);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'ไม่พบรายการสิ่งของนี้' });
+    }
+
+    // กฎ: ประวัติการแชทจะโดนบล็อก/ปิดรับข้อความใหม่เมื่อมีการส่งคืนเรียบร้อยแล้ว (RESOLVED)
+    if (item.status === 'RESOLVED') {
+      return res.status(403).json({
+        success: false,
+        message: 'รายการนี้ได้รับการส่งคืนเรียบร้อยแล้ว การสนทนาถูกปิดไม่ให้ส่งข้อความเพิ่ม'
+      });
+    }
+
+    // ตรวจสอบว่าคนพิมพ์เป็นแอดมินหรือไม่จาก header
+    const adminPassword = req.headers['x-admin-password'];
+    const isAdmin = (adminPassword === ADMIN_PASSWORD);
+
+    const newComment = {
+      text: text.trim(),
+      isAdmin: isAdmin,
+      senderName: isAdmin ? 'แอดมิน (Admin)' : 'ผู้ใช้ทั่วไป (นิรนาม)',
+      createdAt: new Date()
+    };
+
+    item.comments.push(newComment);
+    await item.save();
+
+    return res.status(201).json({
+      success: true,
+      message: 'ส่งข้อความสำเร็จ',
+      data: item.comments
+    });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// 9. DELETE /api/items/:id - แอดมินลบโพสต์ออกจาก MongoDB ทันที (ต้องผ่าน verifyAdmin)
 app.delete('/api/items/:id', verifyAdmin, async (req, res) => {
   try {
     const item = await Item.findByIdAndDelete(req.params.id);

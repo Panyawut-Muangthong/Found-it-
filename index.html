@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Found It! - ระบบแจ้งของหายและพบของในโรงเรียน</title>
   
   <!-- Tailwind CSS CDN -->
@@ -14,7 +14,7 @@
   <!-- Google Fonts (Prompt & Inter) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -22,102 +22,143 @@
         extend: {
           fontFamily: {
             sans: ['Prompt', 'Inter', 'sans-serif'],
+          },
+          screens: {
+            'xs': '420px',
           }
         }
       }
     }
   </script>
-</head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
 
-  <!-- Navbar -->
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center gap-3">
-          <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md">
-            <i data-lucide="package-search" class="w-6 h-6"></i>
+  <style>
+    /* Smooth mobile scrollbar & touch feel */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Safe padding for modern devices (iPhone notch/home indicator) */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- Top Navigation Bar -->
+  <!-- ========================================== -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shadow-sm transition">
+    <div class="max-w-6xl mx-auto px-3.5 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14 sm:h-16">
+        
+        <!-- Logo & Brand -->
+        <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onclick="switchTab('list')">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-tr from-indigo-600 to-violet-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20 flex-shrink-0">
+            <i data-lucide="package-search" class="w-5 h-5 sm:w-5 sm:h-5"></i>
           </div>
-          <div>
-            <h1 class="font-bold text-lg text-slate-900 leading-tight">Found It!</h1>
-            <p class="text-xs text-slate-500">School Lost & Found System</p>
+          <div class="leading-tight">
+            <h1 class="font-bold text-base sm:text-lg text-slate-900 tracking-tight flex items-center gap-1.5">
+              <span>Found It!</span>
+              <span class="text-[10px] font-semibold bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full border border-indigo-100 hidden xs:inline-block">School</span>
+            </h1>
+            <p class="text-[11px] text-slate-500 hidden sm:block">ระบบแจ้งของหายและพบของในโรงเรียน</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
-          <!-- Admin Mode Toggle Button -->
+        <!-- Desktop Navigation Tabs & Admin Controls -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          
+          <!-- Admin Status / Login Pill -->
           <button 
             id="toggleAdminBtn" 
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+            class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 active:scale-95 transition">
             <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400" id="adminIcon"></i>
-            <span id="adminToggleText">เข้าสู่ระบบแอดมิน</span>
+            <span id="adminToggleText" class="hidden xs:inline">แอดมิน</span>
           </button>
 
-          <!-- Navigation Tabs -->
-          <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-sm font-medium">
+          <!-- Desktop Tabs -->
+          <nav class="hidden md:flex bg-slate-100/90 p-1 rounded-xl border border-slate-200 text-sm font-medium">
             <button 
               id="navPostTab" 
-              class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg transition bg-white text-indigo-600 shadow-sm font-semibold">
+              class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900">
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              <span>แจ้งโพสต์</span>
+              <span>แจ้งโพสต์ใหม่</span>
             </button>
             <button 
               id="navListTab" 
-              class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg transition text-slate-600 hover:text-slate-900">
+              class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition bg-white text-indigo-600 shadow-sm font-semibold">
               <i data-lucide="layout-grid" class="w-4 h-4"></i>
-              <span>รายการสิ่งของ</span>
-              <span id="badgeCount" class="ml-1 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+              <span>รายการทั้งหมด</span>
+              <span id="badgeCount" class="ml-1 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.2 rounded-full font-bold">0</span>
             </button>
-          </div>
+          </nav>
         </div>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <!-- Admin Mode Notification Banner -->
-  <div id="adminModeBanner" class="hidden bg-purple-700 text-white px-4 py-2 text-xs sm:text-sm font-medium flex items-center justify-between shadow-inner">
-    <div class="flex items-center gap-2 mx-auto">
-      <i data-lucide="shield-check" class="w-4 h-4 text-purple-200"></i>
-      <span>กำลังใช้งานใน <strong>โหมดแอดมิน (Admin Mode)</strong>: คุณสามารถ <strong>Approve ตรวจ IG</strong> และ <strong>ลบโพสต์ที่ไม่เหมาะสม</strong> ได้</span>
+  <!-- Admin Mode Active Indicator Banner -->
+  <aside id="adminModeBanner" class="hidden bg-purple-700 text-white px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium flex items-center justify-between shadow-inner">
+    <div class="flex items-center gap-2 max-w-6xl mx-auto w-full justify-between">
+      <div class="flex items-center gap-2 truncate">
+        <i data-lucide="shield-check" class="w-4 h-4 text-purple-200 flex-shrink-0"></i>
+        <span class="truncate"><strong>โหมดแอดมิน:</strong> คุณสามารถตรวจ IG, กด Approve และลบโพสต์ได้</span>
+      </div>
+      <button id="adminLogoutBtn" class="text-xs text-purple-200 hover:text-white underline font-semibold flex-shrink-0 ml-3">ออกจากระบบ</button>
     </div>
-    <button id="adminLogoutBtn" class="text-xs underline text-purple-200 hover:text-white ml-2">ออกจากโหมดแอดมิน</button>
-  </div>
+  </aside>
 
-  <!-- Banner Info: 3 Days Auto-Delete -->
-  <div class="bg-amber-50 border-b border-amber-200 text-amber-800 px-4 py-2 text-xs sm:text-sm text-center font-medium flex items-center justify-center gap-2">
-    <i data-lucide="clock-alert" class="w-4 h-4 text-amber-600"></i>
-    <span>ข้อมูลจัดเก็บเป็นเวลา <strong>3 วัน</strong> หลังจากนั้นจะลบอัตโนมัติ (MongoDB TTL) | การส่งมอบต้องระบุ IG และผ่านการ <strong>Approve</strong> โดยแอดมิน</span>
-  </div>
+  <!-- Global Info Bar: 3 Days Auto-Delete Notice -->
+  <section class="bg-gradient-to-r from-amber-50 via-amber-100/60 to-amber-50 border-b border-amber-200/70 text-amber-900 px-3 py-2 text-[11px] sm:text-xs text-center font-medium flex items-center justify-center gap-1.5">
+    <i data-lucide="clock-alert" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0"></i>
+    <span>ข้อมูลจัดเก็บ <strong>3 วัน</strong> หลังจากนั้นจะลบอัตโนมัติ | การรับของต้องผ่านการ <strong>Approve</strong> จากแอดมิน</span>
+  </section>
 
-  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+  <!-- ========================================== -->
+  <!-- Main Content Layout -->
+  <!-- ========================================== -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-3.5 sm:p-6 lg:p-8 mb-16 md:mb-6">
     
     <!-- ======================================================== -->
     <!-- VIEW 1: POST FORM VIEW -->
     <!-- ======================================================== -->
-    <section id="postView" class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-      <header id="headerBanner" class="bg-gradient-to-r from-red-500 to-rose-600 px-6 py-6 text-white text-center transition-colors duration-300">
-        <h2 class="text-2xl font-bold tracking-tight">โพสต์แจ้งสิ่งของ</h2>
-        <p class="text-white/90 text-sm mt-1">กรอกข้อมูลให้ครบถ้วนเพื่อช่วยกันตามหาหรือส่งคืนเจ้าของ</p>
+    <section id="postView" class="hidden max-w-2xl mx-auto bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transition-all duration-300">
+      
+      <!-- Dynamic Form Header -->
+      <header id="headerBanner" class="bg-gradient-to-r from-red-500 via-rose-500 to-rose-600 px-5 sm:px-8 py-6 text-white text-center transition-colors duration-300">
+        <div class="w-12 h-12 bg-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-2 text-white">
+          <i data-lucide="bell-plus" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold tracking-tight">โพสต์แจ้งสิ่งของ</h2>
+        <p class="text-white/90 text-xs sm:text-sm mt-1">กรอกรายละเอียดเพื่อช่วยกันตามหาหรือส่งคืนเจ้าของ</p>
       </header>
 
-      <form id="postItemForm" class="p-6 sm:p-8 space-y-6" novalidate>
+      <form id="postItemForm" class="p-5 sm:p-8 space-y-5 sm:space-y-6" novalidate>
+        
         <!-- Toggle Type: Lost vs Found -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-2">
+          <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
             ประเภทการแจ้ง <span class="text-red-500">*</span>
           </label>
-          <div class="grid grid-cols-2 gap-3 p-1.5 bg-slate-100 rounded-xl border border-slate-200">
+          <div class="grid grid-cols-2 gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80">
             <button 
               type="button" 
               id="toggleLostBtn"
-              class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm transition bg-white text-red-600 shadow-sm border border-slate-200/60">
+              class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all bg-white text-red-600 shadow-sm border border-slate-200/60 active:scale-95">
               <i data-lucide="help-circle" class="w-4 h-4"></i>
               <span>Lost (ของหาย)</span>
             </button>
             <button 
               type="button" 
               id="toggleFoundBtn"
-              class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm transition text-slate-600 hover:text-slate-900">
+              class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-slate-900 active:scale-95">
               <i data-lucide="check-circle" class="w-4 h-4"></i>
               <span>Found (พบของ)</span>
             </button>
@@ -128,11 +169,11 @@
         <!-- Item Name & Category -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label for="itemName" class="block text-sm font-semibold text-slate-700 mb-1">
+            <label for="itemName" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
               ชื่อสิ่งของ <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
                 <i data-lucide="tag" class="w-4 h-4"></i>
               </span>
               <input 
@@ -141,24 +182,24 @@
                 name="itemName" 
                 required
                 placeholder="เช่น กระเป๋าตังค์, หูฟังไร้สาย" 
-                class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
               />
             </div>
           </div>
 
           <div>
-            <label for="category" class="block text-sm font-semibold text-slate-700 mb-1">
+            <label for="category" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
               หมวดหมู่ <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
                 <i data-lucide="shapes" class="w-4 h-4"></i>
               </span>
               <select 
                 id="category" 
                 name="category" 
                 required
-                class="w-full pl-9 pr-8 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition appearance-none">
+                class="w-full pl-10 pr-8 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition appearance-none cursor-pointer">
                 <option value="" disabled selected>เลือกหมวดหมู่</option>
                 <option value="electronics">Electronics (อุปกรณ์อิเล็กทรอนิกส์)</option>
                 <option value="books">Books & Stationery (หนังสือ/เครื่องเขียน)</option>
@@ -178,11 +219,11 @@
         <!-- Location & Date/Time -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label for="location" class="block text-sm font-semibold text-slate-700 mb-1">
+            <label for="location" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
               สถานที่ <span id="locationLabelSuffix">ที่ทำหาย</span> <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
                 <i data-lucide="map-pin" class="w-4 h-4"></i>
               </span>
               <input 
@@ -192,7 +233,7 @@
                 list="locationSuggestions"
                 required
                 placeholder="เลือกหรือพิมพ์สถานที่..." 
-                class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
               />
               <datalist id="locationSuggestions">
                 <option value="โรงอาหาร"></option>
@@ -217,11 +258,11 @@
           </div>
 
           <div>
-            <label for="dateTime" class="block text-sm font-semibold text-slate-700 mb-1">
+            <label for="dateTime" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
               วันและเวลา <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
                 <i data-lucide="calendar" class="w-4 h-4"></i>
               </span>
               <input 
@@ -229,7 +270,7 @@
                 id="dateTime" 
                 name="dateTime" 
                 required
-                class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
               />
             </div>
           </div>
@@ -237,30 +278,30 @@
 
         <!-- Description -->
         <div>
-          <label for="description" class="block text-sm font-semibold text-slate-700 mb-1">รายละเอียดเพิ่มเติม</label>
+          <label for="description" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">รายละเอียดเพิ่มเติม</label>
           <textarea 
             id="description" 
             name="description" 
             rows="3" 
-            placeholder="ระบุสี ตำหนิ สติกเกอร์ หรือจุดเด่นของสิ่งของเพื่อความชัดเจน..."
-            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition resize-none"></textarea>
+            placeholder="ระบุสี ตำหนิ สติกเกอร์ หรือจุดเด่นของสิ่งของ..."
+            class="w-full px-3.5 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition resize-none"></textarea>
         </div>
 
-        <!-- Image Upload -->
+        <!-- Image Upload Drag & Drop -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">รูปภาพสิ่งของ (ถ้ามี)</label>
-          <div id="dropzone" class="relative border-2 border-dashed border-slate-300 hover:border-slate-400 bg-slate-50 rounded-xl p-6 text-center cursor-pointer transition">
+          <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">รูปภาพสิ่งของ (ถ้ามี)</label>
+          <div id="dropzone" class="relative border-2 border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/70 hover:bg-slate-50 rounded-2xl p-5 text-center cursor-pointer transition">
             <input type="file" id="itemImage" name="itemImage" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-            <div id="dropzoneContent" class="flex flex-col items-center justify-center space-y-2 pointer-events-none">
-              <div id="uploadIconContainer" class="p-3 bg-white rounded-full shadow-sm text-red-500">
-                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+            <div id="dropzoneContent" class="flex flex-col items-center justify-center space-y-1.5 pointer-events-none">
+              <div id="uploadIconContainer" class="p-2.5 bg-white rounded-full shadow-sm text-red-500 mb-1">
+                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
               </div>
-              <p class="text-sm font-medium text-slate-700">ลากรูปภาพมาวางที่นี่ หรือ <span class="text-red-500 underline" id="uploadLinkText">เลือกไฟล์</span></p>
-              <p class="text-xs text-slate-400">ขนาดไม่เกิน 5MB</p>
+              <p class="text-xs sm:text-sm font-medium text-slate-700">ลากรูปภาพมาวางที่นี่ หรือ <span class="text-red-500 underline font-semibold" id="uploadLinkText">เลือกไฟล์</span></p>
+              <p class="text-[11px] text-slate-400">ไฟล์รูปภาพขนาดไม่เกิน 5MB</p>
             </div>
             <div id="previewContainer" class="hidden relative inline-block">
-              <img id="imagePreview" src="#" alt="Item Preview" class="max-h-48 w-auto mx-auto rounded-lg shadow-md object-contain border border-slate-200" />
-              <button type="button" id="removeImageBtn" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md z-10">
+              <img id="imagePreview" src="#" alt="Item Preview" class="max-h-44 w-auto mx-auto rounded-xl shadow-md object-contain border border-slate-200" />
+              <button type="button" id="removeImageBtn" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md z-10 active:scale-90 transition">
                 <i data-lucide="x" class="w-4 h-4"></i>
               </button>
             </div>
@@ -268,22 +309,22 @@
         </div>
 
         <!-- Contact Info -->
-        <div class="border-t border-slate-100 pt-5">
-          <h3 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-1.5">
-            <i data-lucide="user-check" class="w-4 h-4 text-slate-500"></i> ข้อมูลติดต่อกลับของผู้โพสต์
+        <div class="border-t border-slate-100 pt-4 sm:pt-5">
+          <h3 class="text-xs sm:text-sm font-semibold text-slate-900 mb-3 flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-4 h-4 text-slate-500"></i> ข้อมูลติดต่อกลับของผู้แจ้ง
           </h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label for="contactName" class="block text-xs font-medium text-slate-600 mb-1">ชื่อผู้ติดต่อ / ห้องเรียน</label>
-              <input type="text" id="contactName" name="contactName" placeholder="เช่น นร. ม.5/2 สมชาย" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
+              <label for="contactName" class="block text-xs font-medium text-slate-600 mb-1">ชื่อผู้ติดต่อ / ชั้นเรียน</label>
+              <input type="text" id="contactName" name="contactName" placeholder="เช่น นร. ม.5/2 สมชาย" class="w-full px-3.5 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
             </div>
             <div>
               <label for="contactInfo" class="block text-xs font-medium text-slate-600 mb-1">เบอร์โทร หรือ LINE ID <span class="text-red-500">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
                   <i data-lucide="phone" class="w-4 h-4"></i>
                 </span>
-                <input type="text" id="contactInfo" name="contactInfo" required placeholder="081-xxx-xxxx หรือ @line_id" class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
+                <input type="text" id="contactInfo" name="contactInfo" required placeholder="081-xxx-xxxx หรือ @line_id" class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
               </div>
             </div>
           </div>
@@ -293,7 +334,7 @@
         <button 
           type="submit" 
           id="submitBtn"
-          class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-red-500/25 transition">
+          class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-red-500/25 active:scale-[0.98] transition">
           <i data-lucide="send" class="w-4 h-4"></i>
           <span id="submitBtnText">โพสต์แจ้งของหาย</span>
         </button>
@@ -303,82 +344,107 @@
     <!-- ======================================================== -->
     <!-- VIEW 2: ITEMS LIST & DASHBOARD VIEW -->
     <!-- ======================================================== -->
-    <section id="listView" class="hidden space-y-6">
+    <section id="listView" class="space-y-4 sm:space-y-6">
       
-      <!-- Top Bar: Filters & Search -->
-      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row gap-4 items-center justify-between">
+      <!-- Top Filters & Search Bar Card -->
+      <div class="bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-200/90 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         
-        <!-- Filter Tabs -->
-        <div class="flex flex-wrap bg-slate-100 p-1 rounded-xl border border-slate-200 w-full lg:w-auto gap-1 text-xs sm:text-sm">
-          <button id="filterAllBtn" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition">
+        <!-- Filter Tabs (Horizontal scrollable on mobile) -->
+        <div class="flex items-center overflow-x-auto no-scrollbar pb-1 md:pb-0 gap-1.5 -mx-1 px-1">
+          <button id="filterAllBtn" class="flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900 text-white shadow-sm transition">
             ทั้งหมด (<span id="countAll">0</span>)
           </button>
-          <button id="filterLostBtn" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+          <button id="filterLostBtn" class="flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/60 transition flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-red-500"></span> ของหาย (<span id="countLost">0</span>)
           </button>
-          <button id="filterFoundBtn" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+          <button id="filterFoundBtn" class="flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/60 transition flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span> พบของ (<span id="countFound">0</span>)
           </button>
-          <button id="filterPendingBtn" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition flex items-center justify-center gap-1.5">
+          <button id="filterPendingBtn" class="flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition flex items-center gap-1.5">
             <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-500"></i>
-            <span>รอแอดมินตรวจ</span> (<span id="countPending">0</span>)
+            <span>รอตรวจ</span> (<span id="countPending">0</span>)
           </button>
-          <button id="filterResolvedBtn" class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+          <button id="filterResolvedBtn" class="flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition flex items-center gap-1.5">
             <i data-lucide="badge-check" class="w-3.5 h-3.5 text-blue-500"></i>
-            <span>พบเจ้าของแล้ว</span> (<span id="countResolved">0</span>)
+            <span>ส่งคืนแล้ว</span> (<span id="countResolved">0</span>)
           </button>
         </div>
 
         <!-- Search Input -->
-        <div class="relative w-full lg:w-72">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+        <div class="relative w-full md:w-64 lg:w-72 flex-shrink-0">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
             <i data-lucide="search" class="w-4 h-4"></i>
           </span>
           <input 
             type="text" 
             id="searchInput" 
-            placeholder="ค้นหาชื่อสิ่งของ, IG..." 
-            class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            placeholder="ค้นหาชื่อสิ่งของ, สถานที่, IG..." 
+            class="w-full pl-9 pr-3.5 py-2 bg-slate-100/80 focus:bg-white border border-transparent focus:border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
       </div>
 
-      <!-- Grid of Items -->
-      <div id="itemsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Items will be dynamically loaded here -->
+      <!-- Grid of Items (Responsive 1 col mobile, 2 col tablet, 3 col desktop) -->
+      <div id="itemsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5">
+        <!-- Dynamically injected items -->
       </div>
 
       <!-- Empty State -->
-      <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
-        <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+      <div id="emptyState" class="hidden text-center py-16 px-4 bg-white rounded-3xl border border-slate-200 shadow-sm">
+        <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
           <i data-lucide="inbox" class="w-8 h-8"></i>
         </div>
-        <h3 class="text-base font-semibold text-slate-700">ไม่พบรายการสิ่งของ</h3>
-        <p class="text-sm text-slate-400 mt-1">ยังไม่มีรายการ หรือไม่มีข้อมูลในแท็บนี้</p>
+        <h3 class="text-base font-bold text-slate-800">ไม่พบรายการสิ่งของ</h3>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">ยังไม่มีการแจ้งรายการ หรือค้นหาไม่พบข้อมูลในเงื่อนไขนี้</p>
+        <button onclick="switchTab('post')" class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl shadow-md shadow-indigo-500/20 active:scale-95 transition">
+          <i data-lucide="plus" class="w-4 h-4"></i> โพสต์แจ้งรายการแรก
+        </button>
       </div>
     </section>
 
   </main>
 
   <!-- ======================================================== -->
-  <!-- MODAL: POST SUCCESS CONFIRMATION -->
+  <!-- Bottom Mobile Navigation Bar (Mobile Native Feel) -->
+  <!-- ======================================================== -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-lg border-t border-slate-200/80 z-40 px-6 py-2 pb-safe flex justify-around items-center shadow-lg">
+    <button 
+      id="mobileNavListBtn" 
+      onclick="switchTab('list')" 
+      class="flex flex-col items-center gap-1 text-indigo-600 py-1 transition">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">รายการสิ่งของ</span>
+    </button>
+    <button 
+      id="mobileNavPostBtn" 
+      onclick="switchTab('post')" 
+      class="flex flex-col items-center gap-1 text-slate-500 py-1 transition">
+      <div class="w-10 h-10 -mt-5 bg-gradient-to-tr from-indigo-600 to-violet-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/30 active:scale-90 transition">
+        <i data-lucide="plus" class="w-6 h-6"></i>
+      </div>
+      <span class="text-[10px] font-semibold mt-0.5">แจ้งโพสต์</span>
+    </button>
+  </nav>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: POST SUCCESS CONFIRMATION -->
   <!-- ======================================================== -->
   <div id="confirmModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl text-center space-y-4">
-      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
-        <i data-lucide="check" class="w-8 h-8"></i>
+    <div class="bg-white rounded-3xl max-w-sm sm:max-w-md w-full p-5 sm:p-6 shadow-2xl text-center space-y-4 animate-in fade-in zoom-in-95 duration-150">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+        <i data-lucide="check-check" class="w-7 h-7"></i>
       </div>
       <div>
-        <h3 class="text-xl font-bold text-slate-900">โพสต์ข้อมูลสำเร็จแล้ว!</h3>
-        <p class="text-sm text-slate-500 mt-1">
-          บันทึกลง MongoDB Atlas เรียบร้อย (เก็บข้อมูล 3 วัน)
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900">โพสต์ข้อมูลสำเร็จ!</h3>
+        <p class="text-xs text-slate-500 mt-1">
+          บันทึกเข้าฐานข้อมูลแล้ว (ข้อมูลจะคงอยู่เป็นเวลา 3 วัน)
         </p>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-left space-y-2 text-xs">
+      <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl text-left space-y-1.5 text-xs">
         <div class="flex justify-between">
           <span class="text-slate-400">รายการ:</span>
-          <span id="modalItemName" class="font-semibold text-slate-800"></span>
+          <span id="modalItemName" class="font-bold text-slate-800"></span>
         </div>
         <div class="flex justify-between">
           <span class="text-slate-400">ประเภท:</span>
@@ -392,119 +458,188 @@
 
       <button 
         id="confirmGoToListBtn" 
-        class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/25 transition">
-        <span>ยืนยันและไปที่หน้ารวมสิ่งของ</span>
+        class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-95 transition text-sm">
+        <span>ดูในหน้ารวมสิ่งของ</span>
         <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </button>
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- MODAL: USER INPUT INSTAGRAM TO CLAIM -->
+  <!-- MODAL 2: USER INPUT INSTAGRAM TO CLAIM -->
   <!-- ======================================================== -->
   <div id="claimModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+    <div class="bg-white rounded-3xl max-w-sm sm:max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-gradient-to-tr from-amber-500 to-pink-500 text-white rounded-xl flex items-center justify-center shadow-md">
-          <i data-lucide="instagram" class="w-6 h-6"></i>
+        <div id="claimModalIconContainer" class="w-11 h-11 bg-gradient-to-tr from-amber-500 via-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
+          <i data-lucide="instagram" class="w-5 h-5"></i>
         </div>
-        <div>
-          <h3 class="text-lg font-bold text-slate-900">ยืนยันขอรับสิ่งของ</h3>
-          <p class="text-xs text-slate-500">กรุณากรอก Instagram ของผู้รับของ</p>
+        <div class="leading-tight">
+          <h3 id="claimModalHeaderTitle" class="text-base sm:text-lg font-bold text-slate-900">แจ้งรับสิ่งของ</h3>
+          <p id="claimModalHeaderSubtitle" class="text-xs text-slate-500">กรุณากรอก Instagram ของผู้รับของ</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
-        <p class="text-slate-500">สิ่งของที่ขอรับ:</p>
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-xs">
+        <p id="claimModalItemLabel" class="text-slate-400 text-[11px]">สิ่งของที่ขอรับ:</p>
         <p class="font-bold text-slate-800 text-sm mt-0.5" id="claimModalItemTitle"></p>
       </div>
 
       <div>
-        <label for="claimInstagramInput" class="block text-xs font-semibold text-slate-700 mb-1">
-          บัญชี Instagram (IG) ของผู้รับของ <span class="text-red-500">*</span>
+        <label id="claimModalIgLabel" for="claimInstagramInput" class="block text-xs font-semibold text-slate-700 mb-1">
+          ชื่อบัญชี Instagram (IG) <span class="text-red-500">*</span>
         </label>
         <div class="relative">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-pink-500 font-bold">@</span>
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-pink-500 font-bold">@</span>
           <input 
             type="text" 
             id="claimInstagramInput" 
-            placeholder="username_ig (เช่น smart.thanaphat)" 
-            class="w-full pl-8 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+            placeholder="username_ig (เช่น thanaphat.k)" 
+            class="w-full pl-8 pr-3.5 py-2.5 bg-slate-50 focus:bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
           />
         </div>
-        <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
-          <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
-          <span>แอดมินจะใช้ IG นี้เพื่อทักไปสอบถามหรือตรวจสอบหลักฐานความเป็นเจ้าของ</span>
+        <p id="claimModalIgHelp" class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1 leading-relaxed">
+          <i data-lucide="info" class="w-3 h-3 text-slate-400 flex-shrink-0"></i>
+          <span>แอดมินจะใช้ IG นี้เพื่อทักไปตรวจหลักฐานก่อนส่งมอบ</span>
         </p>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 pt-2">
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
         <button 
           id="closeClaimModalBtn"
           type="button" 
-          class="w-full py-2.5 px-4 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition text-sm">
+          class="w-full py-2.5 px-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 active:scale-95 transition text-xs sm:text-sm">
           ยกเลิก
         </button>
         <button 
           id="submitClaimBtn"
           type="button" 
-          class="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition text-sm">
-          <i data-lucide="send" class="w-4 h-4"></i>
-          <span>ส่งให้แอดมินตรวจ</span>
+          class="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-2.5 px-3 rounded-xl shadow-md shadow-pink-500/25 active:scale-95 transition text-xs sm:text-sm">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <span>ส่งให้แอดมิน</span>
         </button>
       </div>
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- MODAL: ADMIN LOGIN (PASSWORD AUTHENTICATION) -->
+  <!-- MODAL 3: ADMIN LOGIN -->
   <!-- ======================================================== -->
   <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+    <div class="bg-white rounded-3xl max-w-xs sm:max-w-sm w-full p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
       <div class="text-center">
-        <div class="w-12 h-12 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+        <div class="w-12 h-12 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-sm">
           <i data-lucide="shield-check" class="w-6 h-6"></i>
         </div>
-        <h3 class="text-lg font-bold text-slate-900">เข้าสู่ระบบแอดมิน</h3>
-        <p class="text-xs text-slate-500 mt-0.5">เฉพาะผู้ดูแลระบบที่มีรหัสผ่านเท่านั้น</p>
+        <h3 class="text-base sm:text-lg font-bold text-slate-900">เข้าสู่ระบบแอดมิน</h3>
+        <p class="text-xs text-slate-500 mt-0.5">กรุณากรอกรหัสผ่านผู้ดูแลระบบ</p>
       </div>
 
       <div class="space-y-1">
-        <label for="adminPasswordInput" class="block text-xs font-semibold text-slate-700">รหัสผ่านแอดมิน (Admin Password)</label>
+        <label for="adminPasswordInput" class="block text-xs font-semibold text-slate-700">รหัสผ่านแอดมิน</label>
         <div class="relative">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
             <i data-lucide="key-round" class="w-4 h-4"></i>
           </span>
           <input 
             type="password" 
             id="adminPasswordInput" 
-            placeholder="กรอกรหัสผ่านแอดมิน" 
-            class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+            placeholder="รหัสผ่านแอดมิน" 
+            class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
         </div>
         <p id="adminLoginError" class="hidden text-xs text-red-500 mt-1 font-medium"></p>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 pt-1">
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
         <button 
           id="closeAdminLoginBtn"
           type="button" 
-          class="w-full py-2.5 px-4 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition text-sm">
+          class="w-full py-2.5 px-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 active:scale-95 transition text-xs sm:text-sm">
           ยกเลิก
         </button>
         <button 
           id="submitAdminLoginBtn"
           type="button" 
-          class="w-full flex items-center justify-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition text-sm">
+          class="w-full flex items-center justify-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-3 rounded-xl shadow-md shadow-purple-500/25 active:scale-95 transition text-xs sm:text-sm">
           <span>เข้าสู่ระบบ</span>
         </button>
       </div>
     </div>
   </div>
 
+  <!-- ======================================================== -->
+  <!-- MODAL 4: CHAT / COMMENTS DRAWER MODAL -->
+  <!-- ======================================================== -->
+  <div id="commentsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full h-[85vh] sm:h-[650px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      
+      <!-- Chat Header -->
+      <header class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div class="flex items-center gap-3 truncate">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+          </div>
+          <div class="truncate">
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 truncate" id="commentModalItemTitle">สนทนาเกี่ยวกับสิ่งของ</h3>
+            <p class="text-[11px] text-slate-500 flex items-center gap-1">
+              <span id="commentModalStatusBadge" class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="commentModalStatusText">เปิดรับข้อความ</span>
+            </p>
+          </div>
+        </div>
+        <button id="closeCommentsModalBtn" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-200/60 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </header>
+
+      <!-- Chat Notice Banner -->
+      <div id="chatNoticeBanner" class="bg-amber-50 border-b border-amber-200/60 px-4 py-2 text-[11px] text-amber-800 flex items-center gap-1.5 font-medium">
+        <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0"></i>
+        <span>ผู้ใช้ทั่วไปจะส่งข้อความแบบนิรนาม (ไม่ระบุชื่อ) แอดมินจะมีป้ายชื่อและตรากำกับ</span>
+      </div>
+
+      <!-- Messages Scroll Area -->
+      <div id="commentsMessagesList" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/40">
+        <!-- Messages rendered here -->
+      </div>
+
+      <!-- Chat Input Area (Locked when Resolved) -->
+      <footer id="chatInputArea" class="p-3 sm:p-4 bg-white border-t border-slate-200">
+        <form id="commentForm" class="flex items-center gap-2" onsubmit="handleSendComment(event)">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              id="commentInput" 
+              placeholder="พิมพ์ข้อความสอบถามหรือติดต่อที่นี่..." 
+              autocomplete="off"
+              class="w-full pl-3.5 pr-3 py-2.5 bg-slate-100 focus:bg-white border border-transparent focus:border-indigo-400 rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+          <button 
+            type="submit" 
+            id="sendCommentBtn"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 sm:px-4 sm:py-2.5 rounded-2xl font-bold text-xs sm:text-sm shadow-md shadow-indigo-500/25 active:scale-95 transition flex items-center gap-1.5 flex-shrink-0">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">ส่ง</span>
+          </button>
+        </form>
+
+        <!-- Locked Notice (Shown if RESOLVED) -->
+        <div id="chatLockedBanner" class="hidden text-center py-2 text-xs font-semibold text-slate-500 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-center gap-1.5">
+          <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>ส่งคืนเรียบร้อยแล้ว — การสนทนานี้ถูกปิดถาวร</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
   <!-- JavaScript Application Logic -->
+  <!-- ======================================================== -->
   <script>
-    // Initialize icons
+    // Initialize Icons
     lucide.createIcons();
 
     // Admin State & Password
@@ -519,12 +654,13 @@
     // Elements
     const navPostTab = document.getElementById('navPostTab');
     const navListTab = document.getElementById('navListTab');
+    const mobileNavListBtn = document.getElementById('mobileNavListBtn');
+    const mobileNavPostBtn = document.getElementById('mobileNavPostBtn');
     const postView = document.getElementById('postView');
     const listView = document.getElementById('listView');
     const badgeCount = document.getElementById('badgeCount');
     const toggleAdminBtn = document.getElementById('toggleAdminBtn');
     const adminToggleText = document.getElementById('adminToggleText');
-    const adminIcon = document.getElementById('adminIcon');
     const adminModeBanner = document.getElementById('adminModeBanner');
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
@@ -580,53 +716,43 @@
     document.getElementById('dateTime').value = now.toISOString().slice(0, 16);
 
     /**
-     * Update Admin UI Mode
+     * Admin UI Mode Sync
      */
     function updateAdminUI() {
       if (isAdminMode) {
-        toggleAdminBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 text-white font-bold text-xs shadow-md transition";
-        adminToggleText.textContent = "โหมดแอดมิน (เข้าสู่ระบบแล้ว)";
+        toggleAdminBtn.className = "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition";
+        adminToggleText.textContent = "โหมดแอดมิน";
         adminModeBanner.classList.remove('hidden');
       } else {
-        toggleAdminBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition";
-        adminToggleText.textContent = "เข้าสู่ระบบแอดมิน";
+        toggleAdminBtn.className = "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 active:scale-95 transition";
+        adminToggleText.textContent = "แอดมิน";
         adminModeBanner.classList.add('hidden');
       }
       renderItems();
       lucide.createIcons();
     }
 
-    // Toggle Admin Button Click
     toggleAdminBtn.addEventListener('click', () => {
       if (isAdminMode) {
-        // If already admin, ask to logout
-        if (confirm('ต้องการออกจากโหมดแอดมินใช่หรือไม่?')) {
-          logoutAdmin();
-        }
+        if (confirm('ต้องการออกจากโหมดแอดมินใช่หรือไม่?')) logoutAdmin();
       } else {
-        // Open password login modal
         adminPasswordInput.value = '';
         adminLoginError.classList.add('hidden');
         adminLoginModal.classList.remove('hidden');
-        setTimeout(() => adminPasswordInput.focus(), 100);
+        setTimeout(() => adminPasswordInput.focus(), 150);
         lucide.createIcons();
       }
     });
 
-    closeAdminLoginBtn.addEventListener('click', () => {
-      adminLoginModal.classList.add('hidden');
-    });
-
-    adminLogoutBtn.addEventListener('click', () => {
-      logoutAdmin();
-    });
+    closeAdminLoginBtn.addEventListener('click', () => adminLoginModal.classList.add('hidden'));
+    adminLogoutBtn.addEventListener('click', () => logoutAdmin());
 
     function logoutAdmin() {
       isAdminMode = false;
       adminToken = null;
       sessionStorage.removeItem('foundit_admin_pass');
       updateAdminUI();
-      alert('ออกจากโหมดแอดมินเรียบร้อยแล้ว');
+      loadItemsFromDatabase();
     }
 
     submitAdminLoginBtn.addEventListener('click', async () => {
@@ -638,7 +764,7 @@
       }
 
       submitAdminLoginBtn.disabled = true;
-      submitAdminLoginBtn.innerHTML = `<span>กำลังตรวจสอบ...</span>`;
+      submitAdminLoginBtn.innerHTML = `<span>กำลังเข้าสู่ระบบ...</span>`;
 
       try {
         const res = await fetch('/api/admin/verify', {
@@ -654,7 +780,7 @@
           sessionStorage.setItem('foundit_admin_pass', pass);
           adminLoginModal.classList.add('hidden');
           updateAdminUI();
-          alert('✅ เข้าสู่ระบบแอดมินสำเร็จ! คุณสามารถ Approve หรือ ลบโพสต์ได้แล้ว');
+          loadItemsFromDatabase();
         } else {
           adminLoginError.textContent = json.message || 'รหัสผ่านไม่ถูกต้อง';
           adminLoginError.classList.remove('hidden');
@@ -669,19 +795,34 @@
     });
 
     /**
-     * Navigation Switcher
+     * Responsive Tab Switcher
      */
     function switchTab(viewName) {
       if (viewName === 'post') {
         postView.classList.remove('hidden');
         listView.classList.add('hidden');
-        navPostTab.className = "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white text-indigo-600 shadow-sm font-semibold transition";
-        navListTab.className = "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        
+        // Desktop Tabs
+        navPostTab.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm font-semibold transition";
+        navListTab.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+
+        // Mobile Bottom Navigation
+        mobileNavPostBtn.className = "flex flex-col items-center gap-1 text-indigo-600 py-1 transition";
+        mobileNavListBtn.className = "flex flex-col items-center gap-1 text-slate-400 py-1 transition";
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         postView.classList.add('hidden');
         listView.classList.remove('hidden');
-        navListTab.className = "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white text-indigo-600 shadow-sm font-semibold transition";
-        navPostTab.className = "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        
+        // Desktop Tabs
+        navListTab.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm font-semibold transition";
+        navPostTab.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+
+        // Mobile Bottom Navigation
+        mobileNavListBtn.className = "flex flex-col items-center gap-1 text-indigo-600 py-1 transition";
+        mobileNavPostBtn.className = "flex flex-col items-center gap-1 text-slate-400 py-1 transition";
+        
         loadItemsFromDatabase();
       }
       lucide.createIcons();
@@ -696,23 +837,23 @@
     function setReportType(type) {
       reportTypeInput.value = type;
       if (type === 'LOST') {
-        toggleLostBtn.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm bg-white text-red-600 shadow-sm border border-slate-200/60";
-        toggleFoundBtn.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm text-slate-600 hover:text-slate-900";
-        headerBanner.className = "bg-gradient-to-r from-red-500 to-rose-600 px-6 py-6 text-white text-center transition-colors duration-300";
+        toggleLostBtn.className = "flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm bg-white text-red-600 shadow-sm border border-slate-200/60 active:scale-95 transition";
+        toggleFoundBtn.className = "flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 active:scale-95 transition";
+        headerBanner.className = "bg-gradient-to-r from-red-500 via-rose-500 to-rose-600 px-5 sm:px-8 py-6 text-white text-center transition-colors duration-300";
         locationLabelSuffix.textContent = 'ที่ทำหาย';
         submitBtnText.textContent = 'โพสต์แจ้งของหาย';
-        submitBtn.className = "w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-red-500/25 transition";
-        uploadIconContainer.className = "p-3 bg-white rounded-full shadow-sm text-red-500";
-        uploadLinkText.className = "text-red-500 underline";
+        submitBtn.className = "w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-red-500/25 active:scale-[0.98] transition";
+        uploadIconContainer.className = "p-2.5 bg-white rounded-full shadow-sm text-red-500 mb-1";
+        uploadLinkText.className = "text-red-500 underline font-semibold";
       } else {
-        toggleFoundBtn.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm bg-white text-emerald-600 shadow-sm border border-slate-200/60";
-        toggleLostBtn.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm text-slate-600 hover:text-slate-900";
-        headerBanner.className = "bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-6 text-white text-center transition-colors duration-300";
+        toggleFoundBtn.className = "flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm bg-white text-emerald-600 shadow-sm border border-slate-200/60 active:scale-95 transition";
+        toggleLostBtn.className = "flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 active:scale-95 transition";
+        headerBanner.className = "bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-600 px-5 sm:px-8 py-6 text-white text-center transition-colors duration-300";
         locationLabelSuffix.textContent = 'ที่พบสิ่งของ';
         submitBtnText.textContent = 'โพสต์แจ้งพบของ';
-        submitBtn.className = "w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/25 transition";
-        uploadIconContainer.className = "p-3 bg-white rounded-full shadow-sm text-emerald-500";
-        uploadLinkText.className = "text-emerald-500 underline";
+        submitBtn.className = "w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition";
+        uploadIconContainer.className = "p-2.5 bg-white rounded-full shadow-sm text-emerald-500 mb-1";
+        uploadLinkText.className = "text-emerald-500 underline font-semibold";
       }
       lucide.createIcons();
     }
@@ -721,7 +862,7 @@
     toggleFoundBtn.addEventListener('click', () => setReportType('FOUND'));
 
     /**
-     * Image Upload
+     * Image Upload & Preview
      */
     itemImageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -757,7 +898,7 @@
     });
 
     /**
-     * Submit New Item
+     * Form Submission
      */
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -803,10 +944,10 @@
         modalItemLocation.textContent = result.data.location;
         if (result.data.reportType === 'LOST') {
           modalItemType.textContent = 'Lost (ของหาย)';
-          modalItemType.className = 'font-semibold text-red-600';
+          modalItemType.className = 'font-bold text-red-600';
         } else {
           modalItemType.textContent = 'Found (พบของ)';
-          modalItemType.className = 'font-semibold text-emerald-600';
+          modalItemType.className = 'font-bold text-emerald-600';
         }
         confirmModal.classList.remove('hidden');
 
@@ -833,7 +974,11 @@
      */
     async function loadItemsFromDatabase() {
       try {
-        const res = await fetch('/api/items');
+        const headers = {};
+        if (adminToken) {
+          headers['x-admin-password'] = adminToken;
+        }
+        const res = await fetch('/api/items', { headers });
         const json = await res.json();
         if (json.success) {
           allItems = json.data;
@@ -861,7 +1006,7 @@
     }
 
     /**
-     * Render Items Grid
+     * Render Responsive Item Cards
      */
     function renderItems() {
       const grid = document.getElementById('itemsGrid');
@@ -904,9 +1049,10 @@
         const isLost = item.reportType === 'LOST';
         const isPending = item.status === 'PENDING_APPROVAL';
         const isResolved = item.status === 'RESOLVED';
-        const card = document.createElement('div');
-        card.className = `bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between ${
-          isResolved ? 'border-blue-200 bg-slate-50/70' : isPending ? 'border-amber-300 ring-2 ring-amber-200' : 'border-slate-200'
+        
+        const card = document.createElement('article');
+        card.className = `bg-white rounded-3xl border overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${
+          isResolved ? 'border-blue-200/80 bg-slate-50/50' : isPending ? 'border-amber-300 ring-2 ring-amber-100' : 'border-slate-200/80'
         }`;
 
         // Calculate Remaining Days
@@ -916,70 +1062,74 @@
         const daysLeft = Math.floor(hoursLeft / 24);
 
         const imgTag = item.image && item.image.dataUrl 
-          ? `<img src="${item.image.dataUrl}" alt="${item.itemName}" class="w-full h-44 object-cover ${isResolved ? 'grayscale-[50%]' : ''}">` 
-          : `<div class="w-full h-40 bg-slate-100 flex items-center justify-center text-slate-400">
-               <i data-lucide="image" class="w-8 h-8"></i>
+          ? `<img src="${item.image.dataUrl}" alt="${item.itemName}" loading="lazy" class="w-full h-44 sm:h-48 object-cover ${isResolved ? 'grayscale-[50%]' : ''}">` 
+          : `<div class="w-full h-36 sm:h-40 bg-slate-100/80 flex items-center justify-center text-slate-300">
+               <i data-lucide="image" class="w-10 h-10 stroke-1"></i>
              </div>`;
 
         // Badge Status
         let badgeHtml = '';
         if (isResolved) {
           badgeHtml = `
-            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow-sm text-white bg-blue-600 flex items-center gap-1">
+            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-md text-white bg-blue-600 flex items-center gap-1 backdrop-blur-sm">
               <i data-lucide="badge-check" class="w-3.5 h-3.5"></i>
-              <span>พบเจ้าของแล้ว</span>
+              <span>ส่งคืนเจ้าของแล้ว</span>
             </span>
           `;
         } else if (isPending) {
           badgeHtml = `
-            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow-sm text-white bg-amber-500 flex items-center gap-1">
+            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-md text-white bg-amber-500 flex items-center gap-1 backdrop-blur-sm">
               <i data-lucide="clock" class="w-3.5 h-3.5"></i>
               <span>รอแอดมินตรวจ IG</span>
             </span>
           `;
         } else {
           badgeHtml = `
-            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow-sm text-white ${isLost ? 'bg-red-500' : 'bg-emerald-500'}">
+            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-md text-white backdrop-blur-sm ${isLost ? 'bg-red-500' : 'bg-emerald-500'}">
               ${isLost ? 'ของหาย (Lost)' : 'พบของ (Found)'}
             </span>
           `;
         }
 
-        // Action Section based on status & admin mode
+        // Action Section
         let actionHtml = '';
 
         if (isResolved) {
           actionHtml = `
             <div class="space-y-1.5 pt-1">
-              <div class="w-full py-2 bg-blue-50 text-blue-700 text-xs text-center font-bold rounded-xl border border-blue-200 flex items-center justify-center gap-1.5">
-                <i data-lucide="badge-check" class="w-4 h-4"></i> ส่งคืนเจ้าของแล้ว (Approved)
+              <div class="w-full py-2 bg-blue-50 text-blue-700 text-xs text-center font-bold rounded-xl border border-blue-200/70 flex items-center justify-center gap-1.5">
+                <i data-lucide="badge-check" class="w-4 h-4 text-blue-600"></i> ส่งคืนเจ้าของแล้ว
               </div>
-              ${item.claimantInstagram ? `
-                <div class="text-[11px] text-center text-slate-500">
+              ${isAdminMode && item.claimantInstagram ? `
+                <div class="text-[11px] text-center text-slate-500 truncate">
                   ผู้รับของ: <a href="https://instagram.com/${item.claimantInstagram.replace('@','')}" target="_blank" class="font-bold text-pink-600 hover:underline">${item.claimantInstagram}</a>
                 </div>
-              ` : ''}
+              ` : `
+                <div class="text-[10px] text-center text-slate-400">
+                  (ส่งมอบเรียบร้อยแล้ว)
+                </div>
+              `}
             </div>
           `;
         } else if (isPending) {
           if (isAdminMode) {
             actionHtml = `
-              <div class="space-y-2 pt-1 bg-amber-50/80 -mx-4 -mb-4 p-4 border-t border-amber-200">
+              <div class="space-y-2 pt-1 bg-amber-50/90 -mx-4 -mb-4 p-3.5 sm:p-4 border-t border-amber-200">
                 <div class="flex items-center justify-between text-xs">
-                  <span class="text-amber-800 font-semibold">ผู้ขอรับของ:</span>
-                  <a href="https://instagram.com/${item.claimantInstagram.replace('@','')}" target="_blank" class="font-bold text-pink-600 hover:underline flex items-center gap-1">
-                    <i data-lucide="instagram" class="w-3.5 h-3.5"></i> ${item.claimantInstagram}
+                  <span class="text-amber-900 font-semibold">ผู้ขอรับของ:</span>
+                  <a href="https://instagram.com/${item.claimantInstagram.replace('@','')}" target="_blank" class="font-bold text-pink-600 hover:underline flex items-center gap-1 truncate max-w-[150px]">
+                    <i data-lucide="instagram" class="w-3.5 h-3.5 flex-shrink-0"></i> <span class="truncate">${item.claimantInstagram}</span>
                   </a>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-1">
                   <button 
                     onclick="rejectItemClaim('${item._id}')" 
-                    class="py-2 px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 font-semibold text-xs rounded-xl transition">
+                    class="py-2 px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs rounded-xl transition active:scale-95">
                     ปฏิเสธ
                   </button>
                   <button 
                     onclick="approveItemClaim('${item._id}')" 
-                    class="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-1">
+                    class="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-1 active:scale-95">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i> Approve
                   </button>
                 </div>
@@ -987,34 +1137,47 @@
             `;
           } else {
             actionHtml = `
-              <div class="w-full py-2.5 px-3 bg-amber-50 text-amber-800 text-xs rounded-xl border border-amber-200 space-y-1">
+              <div class="w-full py-2.5 px-3 bg-amber-50 text-amber-800 text-xs rounded-xl border border-amber-200/80 space-y-0.5">
                 <div class="flex items-center justify-between font-semibold">
-                  <span>กำลังรอแอดมินตรวจสอบ</span>
-                  <span class="text-pink-600 font-bold">${item.claimantInstagram}</span>
+                  <span class="truncate mr-1">กำลังรอแอดมินตรวจสอบ</span>
+                  <span class="text-amber-600 text-[11px] font-medium bg-amber-100/80 px-2 py-0.5 rounded-md">มีผู้แจ้งรับแล้ว</span>
                 </div>
-                <p class="text-[11px] text-amber-600">หากแอดมินยืนยันแล้ว รายการจะย้ายไปยัง "พบเจ้าของแล้ว"</p>
+                <p class="text-[10px] text-slate-500">ข้อมูลติดต่อถูกเก็บเป็นความลับ (เฉพาะแอดมินเท่านั้นที่ตรวจสอบได้)</p>
               </div>
             `;
           }
         } else {
-          // Normal OPEN status
-          actionHtml = `
-            <button 
-              onclick="openClaimModal('${item._id}', '${item.itemName.replace(/'/g, "\\'")}')" 
-              class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold text-xs rounded-xl shadow-md transition group">
-              <i data-lucide="instagram" class="w-4 h-4"></i>
-              <span>ฉันเป็นเจ้าของ / แจ้งรับของ (ใส่ IG)</span>
-            </button>
-          `;
+          // Normal OPEN status: แยกข้อความตามประเภทของโพสต์
+          if (isLost) {
+            // โพสต์ของหาย -> ผู้มาแจ้งคือนาย A ทำหาย ดังนั้นคนที่กดปุ่มคือ "คนเจอของ"
+            actionHtml = `
+              <button 
+                onclick="openClaimModal('${item._id}')" 
+                class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>ฉันเจอของชิ้นนี้แล้ว! (แจ้งแอดมินใส่ IG)</span>
+              </button>
+            `;
+          } else {
+            // โพสต์พบของ -> มีคนเก็บได้โพสต์ไว้ ดังนั้นคนที่กดปุ่มคือ "เจ้าของตัวจริง"
+            actionHtml = `
+              <button 
+                onclick="openClaimModal('${item._id}')" 
+                class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl shadow-md shadow-pink-500/20 active:scale-95 transition">
+                <i data-lucide="instagram" class="w-4 h-4"></i>
+                <span>ฉันเป็นเจ้าของสิ่งนี้ (ขอรับของใส่ IG)</span>
+              </button>
+            `;
+          }
         }
 
-        // Admin Delete Button (Only visible when logged in as admin)
+        // Admin Delete Button
         const adminDeleteButtonHtml = isAdminMode ? `
           <button 
             onclick="deleteItemByAdmin('${item._id}', '${item.itemName.replace(/'/g, "\\'")}')"
             title="ลบโพสต์นี้ (สิทธิ์แอดมิน)"
-            class="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full shadow-lg transition z-20">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            class="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-lg active:scale-90 transition z-20">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         ` : '';
 
@@ -1024,42 +1187,59 @@
               ${imgTag}
               ${badgeHtml}
               ${adminDeleteButtonHtml}
-              <span class="absolute ${isAdminMode ? 'top-12' : 'top-3'} right-3 bg-slate-900/70 backdrop-blur-sm text-amber-300 px-2 py-0.5 rounded-md text-[11px] font-medium flex items-center gap-1">
+              <span class="absolute ${isAdminMode ? 'top-12' : 'top-3'} right-3 bg-slate-900/75 backdrop-blur-md text-amber-300 px-2 py-0.5 rounded-lg text-[10px] font-semibold flex items-center gap-1 shadow-sm">
                 <i data-lucide="hourglass" class="w-3 h-3"></i> เหลืออีก ${daysLeft > 0 ? daysLeft + ' วัน' : hoursLeft + ' ชม.'}
               </span>
             </div>
 
-            <div class="p-4 space-y-2">
+            <div class="p-3.5 sm:p-4 space-y-2">
               <div class="flex items-start justify-between gap-2">
-                <h3 class="font-bold text-slate-900 text-base leading-snug ${isResolved ? 'line-through text-slate-500' : ''}">
+                <h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1 ${isResolved ? 'line-through text-slate-400' : ''}">
                   ${item.itemName}
                 </h3>
-                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium capitalize">${item.category}</span>
+                <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-lg font-medium capitalize flex-shrink-0">${item.category}</span>
               </div>
-              <p class="text-xs text-slate-500 line-clamp-2">${item.description || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+              
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed min-h-[2rem]">
+                ${item.description || 'ไม่มีรายละเอียดเพิ่มเติม'}
+              </p>
 
               <div class="pt-2 border-t border-slate-100 space-y-1 text-xs text-slate-600">
-                <div class="flex items-center gap-1.5">
-                  <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
-                  <span>${item.location}</span>
+                <div class="flex items-center gap-1.5 truncate">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                  <span class="truncate font-medium">${item.location}</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                <div class="flex items-center gap-1.5 truncate text-[11px] text-slate-400">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
                   <span>${new Date(item.dateTime).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Card Footer & Action Buttons -->
-          <div class="p-4 bg-slate-50 border-t border-slate-100 space-y-3">
+          <!-- Card Footer & Actions -->
+          <div class="p-3.5 sm:p-4 bg-slate-50/70 border-t border-slate-100 space-y-2.5">
             <div class="flex items-center justify-between text-xs">
-              <div>
-                <span class="text-slate-400 block text-[10px]">ติดต่อผู้โพสต์:</span>
-                <span class="font-semibold text-slate-800">${item.contact.contactInfo}</span>
+              <div class="truncate mr-2">
+                <span class="text-slate-400 block text-[10px]">ติดต่อผู้แจ้ง:</span>
+                <span class="font-semibold text-slate-800 truncate">${item.contact.contactInfo}</span>
               </div>
-              <span class="text-[11px] text-slate-400">${item.contact.contactName}</span>
+              <span class="text-[11px] text-slate-500 flex-shrink-0">${item.contact.contactName}</span>
             </div>
+
+            <!-- Open Chat / Comments Button -->
+            <button 
+              onclick="openCommentsModal('${item._id}')" 
+              class="w-full flex items-center justify-between py-2 px-3 bg-white hover:bg-slate-100/80 border border-slate-200/90 rounded-xl text-xs font-semibold text-slate-700 transition active:scale-98">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 text-indigo-500"></i>
+                <span>พูดคุย / สอบถามแอดมิน</span>
+              </div>
+              <span class="bg-indigo-50 text-indigo-600 text-[11px] px-2 py-0.5 rounded-full font-bold">
+                ${(item.comments && item.comments.length) || 0}
+              </span>
+            </button>
+
             ${actionHtml}
           </div>
         `;
@@ -1070,14 +1250,48 @@
     }
 
     /**
-     * User Claim Modal Flow (Input Instagram)
+     * User Claim Modal Flow
      */
-    window.openClaimModal = function(id, name) {
+    window.openClaimModal = function(id) {
       pendingClaimItemId = id;
-      claimModalItemTitle.textContent = name;
+      const item = allItems.find(i => i._id === id);
+      if (!item) return;
+
+      const isLost = (item.reportType === 'LOST');
+      const modalIconContainer = document.getElementById('claimModalIconContainer');
+      const modalHeaderTitle = document.getElementById('claimModalHeaderTitle');
+      const modalHeaderSubtitle = document.getElementById('claimModalHeaderSubtitle');
+      const modalItemLabel = document.getElementById('claimModalItemLabel');
+      const modalIgLabel = document.getElementById('claimModalIgLabel');
+      const modalIgHelp = document.getElementById('claimModalIgHelp');
+
+      claimModalItemTitle.textContent = `${item.itemName} (${isLost ? 'ของหาย' : 'พบของ'})`;
       claimInstagramInput.value = '';
+
+      if (isLost) {
+        // เมื่อเป็นโพสต์ของหาย: คนกดคือผู้ที่พบของ
+        modalIconContainer.className = "w-11 h-11 bg-gradient-to-tr from-emerald-500 to-teal-500 text-white rounded-2xl flex items-center justify-center shadow-md flex-shrink-0";
+        modalIconContainer.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i>`;
+        modalHeaderTitle.textContent = "ฉันเจอของชิ้นนี้แล้ว!";
+        modalHeaderSubtitle.textContent = "กรุณากรอก IG ของคุณเพื่อให้แอดมินประสานงานส่งมอบ";
+        modalItemLabel.textContent = "สิ่งของที่คนทำหาย:";
+        modalIgLabel.textContent = "บัญชี Instagram ของคุณ (ผู้พบของ)";
+        modalIgHelp.textContent = "แอดมินจะติดต่อทาง IG เพื่อรับมอบสิ่งของส่งคืนเจ้าของ";
+        submitClaimBtn.className = "w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold py-2.5 px-3 rounded-xl shadow-md shadow-emerald-500/25 active:scale-95 transition text-xs sm:text-sm";
+      } else {
+        // เมื่อเป็นโพสต์พบของ: คนกดคือเจ้าของที่ทำหาย
+        modalIconContainer.className = "w-11 h-11 bg-gradient-to-tr from-amber-500 via-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center shadow-md flex-shrink-0";
+        modalIconContainer.innerHTML = `<i data-lucide="instagram" class="w-5 h-5"></i>`;
+        modalHeaderTitle.textContent = "ฉันเป็นเจ้าของสิ่งนี้";
+        modalHeaderSubtitle.textContent = "กรุณากรอก IG เพื่อให้แอดมินตรวจสอบความเป็นเจ้าของ";
+        modalItemLabel.textContent = "สิ่งของที่พบ:";
+        modalIgLabel.textContent = "บัญชี Instagram ของคุณ (เจ้าของ)";
+        modalIgHelp.textContent = "แอดมินจะทักไปทาง IG เพื่อตรวจหลักฐานก่อนส่งมอบ";
+        submitClaimBtn.className = "w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-2.5 px-3 rounded-xl shadow-md shadow-pink-500/25 active:scale-95 transition text-xs sm:text-sm";
+      }
+
       claimModal.classList.remove('hidden');
-      setTimeout(() => claimInstagramInput.focus(), 100);
+      setTimeout(() => claimInstagramInput.focus(), 150);
       lucide.createIcons();
     };
 
@@ -1094,7 +1308,7 @@
       }
 
       submitClaimBtn.disabled = true;
-      submitClaimBtn.innerHTML = `<span>กำลังส่งข้อมูล...</span>`;
+      submitClaimBtn.innerHTML = `<span>กำลังส่ง...</span>`;
 
       try {
         const response = await fetch(`/api/items/${pendingClaimItemId}/claim`, {
@@ -1116,22 +1330,22 @@
         renderItems();
         setActiveFilter('PENDING');
 
-        alert(`✅ ส่งคำขอรับของพร้อม IG: ${result.data.claimantInstagram} เรียบร้อยแล้ว!\nระบบได้ส่งเรื่องให้แอดมินตรวจสอบแล้วครับ`);
+        alert(`✅ ส่งคำขอรับของ (@${result.data.claimantInstagram.replace('@','')}) เรียบร้อยแล้ว!\nระบบได้ส่งเรื่องให้แอดมินตรวจสอบแล้วครับ`);
       } catch (err) {
         alert(`เกิดข้อผิดพลาด: ${err.message}`);
       } finally {
         submitClaimBtn.disabled = false;
-        submitClaimBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>ส่งให้แอดมินตรวจ</span>`;
+        submitClaimBtn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i><span>ส่งให้แอดมิน</span>`;
         pendingClaimItemId = null;
         lucide.createIcons();
       }
     });
 
     /**
-     * Admin Approve Action (Requires Password Auth)
+     * Admin Approve Action
      */
     window.approveItemClaim = async function(id) {
-      if (!confirm('ยืนยันอนุมัติการส่งมอบสิ่งของนี้ และย้ายไปยัง "พบเจ้าของแล้ว" ใช่หรือไม่?')) return;
+      if (!confirm('ยืนยันอนุมัติการส่งมอบสิ่งของนี้ และย้ายไปยัง "ส่งคืนแล้ว" ใช่หรือไม่?')) return;
       try {
         const res = await fetch(`/api/items/${id}/approve`, { 
           method: 'POST',
@@ -1152,7 +1366,7 @@
     };
 
     /**
-     * Admin Reject Action (Requires Password Auth)
+     * Admin Reject Action
      */
     window.rejectItemClaim = async function(id) {
       if (!confirm('ยืนยันปฏิเสธคำขอรับของนี้ (สิ่งของจะกลับสู่สถานะปกติ) ใช่หรือไม่?')) return;
@@ -1178,7 +1392,7 @@
     };
 
     /**
-     * Admin Delete Item Action (Requires Password Auth)
+     * Admin Delete Item Action
      */
     window.deleteItemByAdmin = async function(id, name) {
       if (!confirm(`⚠️ ยืนยันการลบโพสต์ "${name}" ออกจากระบบถาวรหรือไม่?`)) return;
@@ -1191,11 +1405,10 @@
         const json = await res.json();
         if (!res.ok || !json.success) throw new Error(json.message);
 
-        // Remove from local list
         allItems = allItems.filter(i => i._id !== id);
         updateCounters();
         renderItems();
-        alert(`🗑️ ${json.message}`);
+        alert(`🗑️ ลบโพสต์เรียบร้อยแล้ว`);
       } catch (err) {
         alert(`เกิดข้อผิดพลาดในการลบ: ${err.message}`);
       }
@@ -1205,12 +1418,12 @@
      * Filter Buttons Handlers
      */
     function resetFilterBtnStyles() {
-      const defaultClass = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5";
+      const defaultClass = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/60 transition flex items-center gap-1.5";
       filterAllBtn.className = defaultClass;
       filterLostBtn.className = defaultClass;
       filterFoundBtn.className = defaultClass;
-      filterPendingBtn.className = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition flex items-center justify-center gap-1.5";
-      filterResolvedBtn.className = defaultClass;
+      filterPendingBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition flex items-center gap-1.5";
+      filterResolvedBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition flex items-center gap-1.5";
     }
 
     function setActiveFilter(filterName) {
@@ -1218,18 +1431,173 @@
       resetFilterBtnStyles();
 
       if (filterName === 'ALL') {
-        filterAllBtn.className = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-semibold bg-white text-slate-900 shadow-sm transition flex items-center justify-center";
+        filterAllBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900 text-white shadow-sm transition";
       } else if (filterName === 'LOST') {
-        filterLostBtn.className = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-semibold bg-white text-red-600 shadow-sm transition flex items-center justify-center gap-1.5";
+        filterLostBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-red-600 text-white shadow-sm transition flex items-center gap-1.5";
       } else if (filterName === 'FOUND') {
-        filterFoundBtn.className = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-600 shadow-sm transition flex items-center justify-center gap-1.5";
+        filterFoundBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5";
       } else if (filterName === 'PENDING') {
-        filterPendingBtn.className = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-semibold bg-amber-500 text-white shadow-sm transition flex items-center justify-center gap-1.5";
+        filterPendingBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-amber-500 text-white shadow-sm transition flex items-center gap-1.5";
       } else if (filterName === 'RESOLVED') {
-        filterResolvedBtn.className = "flex-1 sm:flex-none px-3 py-1.5 rounded-lg font-semibold bg-white text-blue-600 shadow-sm transition flex items-center justify-center gap-1.5";
+        filterResolvedBtn.className = "flex-shrink-0 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white shadow-sm transition flex items-center gap-1.5";
       }
       renderItems();
     }
+
+    // Elements for Comments Modal
+    const commentsModal = document.getElementById('commentsModal');
+    const closeCommentsModalBtn = document.getElementById('closeCommentsModalBtn');
+    const commentModalItemTitle = document.getElementById('commentModalItemTitle');
+    const commentModalStatusBadge = document.getElementById('commentModalStatusBadge');
+    const commentModalStatusText = document.getElementById('commentModalStatusText');
+    const commentsMessagesList = document.getElementById('commentsMessagesList');
+    const commentForm = document.getElementById('commentForm');
+    const commentInput = document.getElementById('commentInput');
+    const chatLockedBanner = document.getElementById('chatLockedBanner');
+    let currentCommentItemId = null;
+
+    /**
+     * Open & Render Comments Modal
+     */
+    window.openCommentsModal = function(itemId) {
+      currentCommentItemId = itemId;
+      const item = allItems.find(i => i._id === itemId);
+      if (!item) return;
+
+      commentModalItemTitle.textContent = `${item.itemName} (${item.reportType === 'LOST' ? 'ของหาย' : 'พบของ'})`;
+
+      const isResolved = (item.status === 'RESOLVED');
+      if (isResolved) {
+        commentModalStatusBadge.className = "inline-block w-2 h-2 rounded-full bg-slate-400";
+        commentModalStatusText.textContent = "ปิดการสนทนา (ส่งคืนแล้ว)";
+        commentForm.classList.add('hidden');
+        chatLockedBanner.classList.remove('hidden');
+      } else {
+        commentModalStatusBadge.className = "inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+        commentModalStatusText.textContent = "เปิดรับข้อความ";
+        commentForm.classList.remove('hidden');
+        chatLockedBanner.classList.add('hidden');
+      }
+
+      renderCommentsList(item.comments || []);
+      commentsModal.classList.remove('hidden');
+      setTimeout(() => {
+        commentsMessagesList.scrollTop = commentsMessagesList.scrollHeight;
+        if (!isResolved) commentInput.focus();
+      }, 100);
+      lucide.createIcons();
+    };
+
+    closeCommentsModalBtn.addEventListener('click', () => {
+      commentsModal.classList.add('hidden');
+      currentCommentItemId = null;
+    });
+
+    function renderCommentsList(comments) {
+      commentsMessagesList.innerHTML = '';
+      if (!comments || comments.length === 0) {
+        commentsMessagesList.innerHTML = `
+          <div class="text-center py-10 text-slate-400 text-xs">
+            <i data-lucide="message-circle" class="w-8 h-8 mx-auto mb-2 opacity-50 stroke-1"></i>
+            <p>ยังไม่มีข้อความสนทนาในโพสต์นี้</p>
+            <p class="text-[11px] mt-0.5">พิมพ์ข้อความเพื่อติดต่อสอบถามแอดมินหรือผู้แจ้งได้เลย</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      comments.forEach(c => {
+        const timeStr = new Date(c.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        const msgEl = document.createElement('div');
+        msgEl.className = "flex flex-col space-y-1";
+
+        if (c.isAdmin) {
+          // Admin Message: Logo, Badge, Distinct Styling
+          msgEl.innerHTML = `
+            <div class="flex items-center gap-1.5 self-start">
+              <div class="w-5 h-5 rounded-md bg-purple-600 text-white flex items-center justify-center text-[10px] shadow-sm">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              </div>
+              <span class="text-[11px] font-bold text-purple-700">แอดมิน (Admin)</span>
+              <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.2 rounded font-semibold">Official</span>
+              <span class="text-[10px] text-slate-400 ml-1">${timeStr}</span>
+            </div>
+            <div class="self-start max-w-[85%] bg-purple-50 border border-purple-200/90 text-purple-950 p-3 rounded-2xl rounded-tl-sm text-xs leading-relaxed shadow-sm">
+              ${c.text}
+            </div>
+          `;
+        } else {
+          // Anonymous User Message: No Name, Minimal clean bubble
+          msgEl.innerHTML = `
+            <div class="flex items-center gap-1.5 self-end">
+              <span class="text-[10px] text-slate-400 mr-1">${timeStr}</span>
+              <span class="text-[11px] font-medium text-slate-500">ผู้ใช้ทั่วไป</span>
+            </div>
+            <div class="self-end max-w-[85%] bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-sm text-xs leading-relaxed shadow-sm">
+              ${c.text}
+            </div>
+          `;
+        }
+        commentsMessagesList.appendChild(msgEl);
+      });
+      lucide.createIcons();
+    }
+
+    /**
+     * Send Comment Handler
+     */
+    window.handleSendComment = async function(e) {
+      e.preventDefault();
+      const textVal = commentInput.value.trim();
+      if (!textVal || !currentCommentItemId) return;
+
+      const sendBtn = document.getElementById('sendCommentBtn');
+      sendBtn.disabled = true;
+      commentInput.disabled = true;
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (adminToken) {
+          headers['x-admin-password'] = adminToken;
+        }
+
+        const res = await fetch(`/api/items/${currentCommentItemId}/comments`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ text: textVal })
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'ส่งข้อความไม่สำเร็จ');
+        }
+
+        commentInput.value = '';
+        
+        // Update local item comments
+        const target = allItems.find(i => i._id === currentCommentItemId);
+        if (target) {
+          target.comments = json.data;
+          renderCommentsList(target.comments);
+        }
+
+        // Scroll to bottom
+        setTimeout(() => {
+          commentsMessagesList.scrollTop = commentsMessagesList.scrollHeight;
+        }, 50);
+
+        // Update comment counter on cards
+        renderItems();
+
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        sendBtn.disabled = false;
+        commentInput.disabled = false;
+        commentInput.focus();
+      }
+    };
 
     filterAllBtn.addEventListener('click', () => setActiveFilter('ALL'));
     filterLostBtn.addEventListener('click', () => setActiveFilter('LOST'));
@@ -1239,9 +1607,9 @@
 
     searchInput.addEventListener('input', renderItems);
 
-    // Initial Load & Restore Admin Session if exists
+    // Initial Load & Admin state restore
     updateAdminUI();
-    loadItemsFromDatabase();
+    switchTab('list');
   </script>
 </body>
 </html>
